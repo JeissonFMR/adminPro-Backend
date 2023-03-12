@@ -29,13 +29,58 @@ module.exports.HospitalesController = {
 
   },
   actualizarHospital: async (req, res) => {
-    res.status(200).json({
-      msg: 'actualiza hospital'
-    })
+
+    try {
+
+      const { params: { id } } = req
+      const usuarioid = req._id // viene de validacion jwt
+
+
+      const hospitalDB = await Hospital.findById(id)
+
+      if (!hospitalDB) {
+        return res.status(404).json({
+          msg: 'Hospital no encontrado'
+        })
+      }
+
+      const cambiosHospitales = {
+        ...req.body,
+        usuario: usuarioid
+      }
+
+      const hospitalActualizado = await Hospital.findByIdAndUpdate(id, cambiosHospitales, { new: true })
+
+
+      return res.status(200).send({ hospital: hospitalActualizado })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ msg: 'Error al actualizar hospital, hable con el administrador' })
+    }
+
   },
   eliminarHospital: async (req, res) => {
-    res.status(200).json({
-      msg: 'eliminar hospital'
-    })
+
+    try {
+
+      const { params: { id } } = req
+
+
+      const hospitalDB = await Hospital.findById(id)
+
+      if (!hospitalDB) {
+        return res.status(404).json({
+          msg: 'Hospital no encontrado'
+        })
+      }
+
+      await Hospital.findByIdAndDelete(id)
+
+      return res.status(200).send({ msg: 'Hospital eliminado' })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ msg: 'Error al actualizar hospital, hable con el administrador' })
+    }
+
   }
 }

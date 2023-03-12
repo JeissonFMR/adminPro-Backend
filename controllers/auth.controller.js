@@ -2,6 +2,7 @@ const express = require('express')
 const bcryptjs = require('bcryptjs')
 const Usuario = require('../models/usuario.model');
 const { generarJWT } = require('../helpers/jwt');
+const { response } = require('express');
 
 
 module.exports.AuthController = {
@@ -44,5 +45,16 @@ module.exports.AuthController = {
         msj: 'Ocurrio un error en el login'
       })
     }
+  },
+  renewLogin: async (req, res = response) => {
+
+    const idUsuario = req._id
+    const usuarioDB = await Usuario.findOne({ _id: idUsuario })
+
+
+    const token = await generarJWT(usuarioDB)
+
+    res.send({ msg: token })
+
   }
 }

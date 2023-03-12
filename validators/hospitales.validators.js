@@ -8,5 +8,11 @@ const validatorCrearHospital = [
   }
 ];
 
+const validatorActualizarHospital = [
+  check('nombre', 'El nombre es obligatorio.').exists().notEmpty(),
+  (req, res, next) => {
+    return validateResults(req, res, next)
+  }
+];
 
-module.exports = { validatorCrearHospital }
+module.exports = { validatorCrearHospital, validatorActualizarHospital }

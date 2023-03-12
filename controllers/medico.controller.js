@@ -32,13 +32,56 @@ module.exports.MedicosController = {
     }
   },
   actualizarMedico: async (req, res) => {
-    res.status(200).json({
-      msg: 'actualiza medico'
-    })
+    try {
+
+      const { params: { id } } = req
+      const usuarioid = req._id // viene de validacion jwt
+
+
+      const medicoDB = await Medico.findById(id)
+
+      if (!medicoDB) {
+        return res.status(404).json({
+          msg: 'Médico no encontrado'
+        })
+      }
+
+      const cambiosMedico = {
+        ...req.body,
+        usuario: usuarioid
+      }
+
+      const medicoActualizado = await Medico.findByIdAndUpdate(id, cambiosMedico, { new: true })
+
+
+      return res.status(200).send({ medico: medicoActualizado })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ msg: 'Error al actualizar hospital, hable con el administrador' })
+    }
   },
   eliminarMedico: async (req, res) => {
-    res.status(200).json({
-      msg: 'eliminar medico'
-    })
+    try {
+
+      const { params: { id } } = req
+
+
+      const medicoDB = await Medico.findById(id)
+
+      if (!medicoDB) {
+        return res.status(404).json({
+          msg: 'Médico no encontrado'
+        })
+      }
+
+
+      await Medico.findByIdAndDelete(id)
+
+
+      return res.status(200).send({ msg: 'Médico eliminado.' })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ msg: 'Error al actualizar hospital, hable con el administrador' })
+    }
   }
 }

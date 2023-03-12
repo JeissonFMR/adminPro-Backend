@@ -26,6 +26,8 @@ medicosAPI(app)
 busquedaAPI(app)
 subirArchivoAPI(app)
 
+app.use(express.static('./public'))
+
 const port = process.env.PORT || 3005
 app.listen(port, () => {
   console.log(`Servidor corriendo en el puerto ${port}`);
