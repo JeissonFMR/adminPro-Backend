@@ -1,6 +1,5 @@
 const Usuario = require('../models/usuario.model')
 const bcryptjs = require('bcryptjs')
-const { findById, findByIdAndUpdate } = require('../models/usuario.model')
 const { generarJWT } = require('../helpers/jwt')
 
 module.exports.UsuariosController = {
@@ -12,10 +11,30 @@ module.exports.UsuariosController = {
    */
   obtenerTodos: async (req, res) => {
 
-    const usuario = await Usuario.find({}, 'nombre role email google')
+
+    //TODO: paginación
+    const desde = Number(req.query.desde) || 0;
+
+    // const usuario = await Usuario.find({}, 'nombre role email google')
+    //   .skip(desde) //paginacion
+    //   .limit(5) //paginacion
+
+    // //cuantos registros hay en total
+    // const totalUsuarios = await Usuario.count()
+
+    const [usuarios, totalUsuarios] = await Promise.all([
+      Usuario.find({}, 'nombre role email google img')
+        .skip(desde) //paginacion
+        .limit(5), //paginacion
+
+      //cuantos registros hay en total
+      Usuario.count()
+
+    ])
     res.status(200).json({
-      usuario,
-      idUser: req._id
+      usuarios,
+      // idUser: req._id,
+      totalUsuarios,
     })
 
   },
@@ -30,6 +49,7 @@ module.exports.UsuariosController = {
 
     try {
       const { body } = req;
+
       const existeEmail = await Usuario.findOne({ email: body.email })
       if (existeEmail) {
         return res.status(400).send('El correo ya está en uso')
@@ -39,7 +59,8 @@ module.exports.UsuariosController = {
       const salt = bcryptjs.genSaltSync();
       const passwordEncrypt = await bcryptjs.hash(contrasenaPlana, salt)
 
-      const usuario = await Usuario.create({ usuario: body.usuario, email: body.email, password: passwordEncrypt })
+      const usuario = await Usuario.create({ nombre: body.nombre, email: body.email, password: passwordEncrypt })
+
       usuario.set('password', undefined, { strict: false }) //no envio la contraseña como data ...
 
 
