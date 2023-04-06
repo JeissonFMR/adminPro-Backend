@@ -10,8 +10,6 @@ module.exports.UsuariosController = {
    * @param {nombre, role, email, google} res 
    */
   obtenerTodos: async (req, res) => {
-
-
     //TODO: paginación
     const desde = Number(req.query.desde) || 0;
 
@@ -52,7 +50,7 @@ module.exports.UsuariosController = {
 
       const existeEmail = await Usuario.findOne({ email: body.email })
       if (existeEmail) {
-        return res.status(400).send('El correo ya está en uso')
+        return res.status(400).send({ msg: 'El correo ya está en uso' })
       }
 
       const contrasenaPlana = body.password

@@ -24,16 +24,16 @@ module.exports.AuthController = {
       const validPassword = bcryptjs.compareSync(password, usuarioDB.password)
       if (!validPassword) {
         return res.status(400).json({
-          msj: 'Contraseña no válida'
+          msg: 'Contraseña no válida'
         })
       }
 
       //TODO: GENERAR UN TOKEN
       const token = await generarJWT(usuarioDB)
-      console.log(token);
+      // console.log(token);
 
       res.status(200).json({
-        msj: {
+        msg: {
           token
         }
       })
@@ -49,12 +49,24 @@ module.exports.AuthController = {
   renewLogin: async (req, res = response) => {
 
     const idUsuario = req._id
-    const usuarioDB = await Usuario.findOne({ _id: idUsuario })
 
+    const usuarioDB = await Usuario.findOne({ _id: idUsuario })
+    const { email, role, img, nombre } = usuarioDB
+    const usuario = new Usuario({
+      _id: idUsuario,
+      nombre,
+      email,
+      role,
+      img
+    })
 
     const token = await generarJWT(usuarioDB)
 
-    res.send({ msg: token })
+
+    // { usuario } = email
+    // console.log(usuario);
+
+    res.send({ msg: token, usuario })
 
   }
 }
