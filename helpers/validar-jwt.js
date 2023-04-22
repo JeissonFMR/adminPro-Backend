@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-
+const Usuario = require('../models/usuario.model')
 
 const validarToken = async (req, res, next) => {
 
@@ -17,10 +17,33 @@ const validarToken = async (req, res, next) => {
 
     next()
   } catch (error) {
-    res.status(403).send('No estas autenticado, token incorecto')
+    res.status(403).send('No estas autenticado, token incorrecto')
+  }
+}
+
+
+const validarADMIN_ROLE = async (req, res, next) => {
+  try {
+    const uid = req._id
+
+    const usuarioDB = await Usuario.findById(uid)
+
+    if (!usuarioDB) {
+      return res.status(404).send({ ok: false, msg: 'Usuario no existe' })
+    }
+
+    if (usuarioDB.role !== 'ADMIN_ROLE') {
+      return res.status(403).send({ ok: false, msg: 'No tiene privilegios para esto.' })
+    }
+
+    next()
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ ok: false, msg: 'Hable con el administrador' })
   }
 }
 
 module.exports = {
-  validarToken
+  validarToken,
+  validarADMIN_ROLE
 }

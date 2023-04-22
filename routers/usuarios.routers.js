@@ -3,7 +3,7 @@ const router = Router();
 
 //Controladores
 const { UsuariosController } = require('../controllers/usuarios.controller');
-const { validarToken } = require('../helpers/validar-jwt');
+const { validarToken, validarADMIN_ROLE } = require('../helpers/validar-jwt');
 
 
 //Validadores
@@ -13,7 +13,7 @@ module.exports.UsersAPI = (app) => {
   router
     .get('/', validarToken, UsuariosController.obtenerTodos)
     .post('/', validatorCrearUsuario, UsuariosController.crearUsuario)
-    .put('/:id', validarToken, validatorActualizarUsuario, UsuariosController.actualizarUsuario)
-    .delete('/:id', validarToken, UsuariosController.borrarUsuario)
+    .put('/:id', validarToken, validarADMIN_ROLE, validatorActualizarUsuario, UsuariosController.actualizarUsuario)
+    .delete('/:id', [validarToken, validarADMIN_ROLE], UsuariosController.borrarUsuario)
   app.use('/api/usuarios', router)
 }
